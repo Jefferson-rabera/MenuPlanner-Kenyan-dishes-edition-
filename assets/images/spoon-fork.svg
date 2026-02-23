@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100" aria-hidden="true">
+  <!-- Clear spoon and fork icon -->
+  <defs>
+    <style>
+      .utensil { fill: #00501a; }
+    </style>
+  </defs>
+  
+  <!-- Spoon (left side) -->
+  <!-- Spoon bowl -->
+  <ellipse cx="28" cy="70" rx="14" ry="16" class="utensil"/>
+  <!-- Spoon handle -->
+  <rect x="24" y="10" width="8" height="60" rx="4" class="utensil"/>
+  
+  <!-- Fork (right side) -->
+  <!-- Fork handle -->
+  <rect x="68" y="15" width="8" height="50" rx="4" class="utensil"/>
+  <!-- Fork prongs -->
+  <rect x="60" y="65" width="4" height="20" rx="2" class="utensil"/>
+  <rect x="68" y="65" width="4" height="20" rx="2" class="utensil"/>
+  <rect x="76" y="65" width="4" height="20" rx="2" class="utensil"/>
+</svg>
