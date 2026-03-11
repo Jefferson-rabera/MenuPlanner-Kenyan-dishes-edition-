@@ -1,121 +1,176 @@
-# Kenyan Meal Planner — MenuKe
+# MenuKe — Kenyan Regional Meal Planner
 
-A lightweight client-side Meal Planner focused on Kenyan regional dishes. This small web app helps users discover regional recipes, schedule meals for a week, and generate a printable weekly shopping list (PDF) including recipe ingredients and step-by-step instructions.
+> Plan your week around Kenya's 47 counties and 8 culinary regions.
 
----
-
-## Features
-
-- **Discover recipes by county/region:** Pick a county and view recipes curated for that region.
-- **Favorites:** Mark recipes as favorites for quick access.
-- **Weekly planner:** Assign recipes to days of the week in a simple planner UI.
-- **Printable shopping list (PDF):** Click the print button to generate a PDF that includes each scheduled meal with ingredients and numbered cooking steps, plus a consolidated shopping checklist.
-- **Image thumbnails:** Recipe images may be single URLs or an array of image URLs (primary + thumbnails).
+A web-based meal planning app where you select your county, browse regionally appropriate food items, build a daily plate, and plan your full week — then download a PDF shopping list.
 
 ---
 
 ## Project Structure
 
-- `index.html` — UI shell and script/style includes.
-- `script.js` — Core application logic: dataset (`recipes`), rendering, scheduling, favorites, and PDF generation.
-- `styles.css` — App styles.
-
-Files are in the project root. Open [index.html](index.html) in a browser to run the app.
-
----
-
-## Getting Started (Local)
-
-Prerequisites: any modern browser (Chrome/Firefox/Edge) with JavaScript enabled.
-
-1. Clone or download the project folder to your machine.
-2. Open the project folder and double-click `index.html` or serve it with a simple local server (recommended if you want to avoid some image/CORS quirks):
-
-```bash
-# from the project folder
-python3 -m http.server 8000
-# then open http://localhost:8000 in your browser
 ```
-
-3. Use the county selector to explore recipes, mark favorites, assign meals to days, and click the `Print Weekly Menu` / `Print Shopping List` button to download the PDF.
-
----
-
-## How the Data Works
-
-- Recipes are defined in `script.js` in the `recipes` array. Each recipe object includes fields such as `id`, `name`, `region`, `nutrition`, `type`, `calories`, `ingredients`, `instructions`, and `img`.
-- `ingredients` is an array of strings used when constructing the consolidated shopping list.
-- `instructions` is an array of step strings that are printed under each scheduled meal in the PDF.
-- `img` may be either a single string URL or an array of string URLs. When an array is supplied, the app uses the first URL as the primary image and shows the others as thumbnails in the UI.
-
-Example recipe snippet (from `script.js`):
-
-```js
-{
-  id: 7,
-  name: "Mursik & Managu",
-  region: "Rift Valley",
-  ingredients: ["Millet Ugali (or maize)", "Milk (for mursik)", "Managu (green leaves)"],
-  instructions: ["Prepare mursik...", "Cook ugali...", "Sauté managu..."],
-  img: ["https://.../ugali.jpg", "https://.../managu.jpg"]
-}
+MenuPlanner-Kenyan-dishes-edition/
+├── index.html          # App shell — HTML structure only
+├── script.js           # All JavaScript — data, state, 20 functions
+├── styles.css          # All CSS styling
+├── server.js           # Node.js proxy server (required to run the app)
+└── package.json        # Node project config
 ```
 
 ---
 
-## PDF Generation
+## Running the App
 
-- The PDF is generated client-side using jsPDF (included via CDN in `index.html`).
-- Clicking the print button calls `generateShoppingList()` in `script.js`. That function:
-  - Collects scheduled meals from `weeklySchedule` (stored in `localStorage`).
-  - Writes each scheduled day with recipe name, ingredients list, and numbered steps.
-  - Adds a consolidated shopping checklist summarizing ingredients across meals.
+> **Important:** You must open the app through the Node.js server. Opening `index.html` directly in a browser will not work — food images depend on the proxy server.
 
-Notes: PDF text layout is simple — long lines may wrap; images are not embedded into the PDF by default.
+### Step 1 — Install Node.js *(first time only)*
 
----
+Download and install the LTS version from [nodejs.org](https://nodejs.org).
 
-## Image Sources & Licensing
+### Step 2 — Start the server
 
-- Several recipe images are remote URLs, including images sourced from Wikimedia Commons. When using third-party images in the app or for distribution, verify the license on the original file page and provide appropriate attribution if required.
-- If you prefer to guarantee availability and remove external dependencies, download the desired image files and place them in the project directory (for example, `assets/images/`), then update the `img` fields in `script.js` to reference the local relative paths (e.g., `img: "assets/images/ugali.jpg"`).
+```powershell
+cd "C:\path\to\MenuPlanner-Kenyan-dishes-edition"
+node server.js
+```
 
-Attribution example (some Commons images used in this repo):
+You should see:
 
-- "Ugali, Maini and Sukuma managu.jpg" — Harmon Mutunga — CC BY-SA 4.0 — https://commons.wikimedia.org/wiki/File:Ugali,_Maini_and_Sukuma_managu.jpg
-- "Traditional Managu.jpg" — Mmaua1 — CC BY 4.0 — https://commons.wikimedia.org/wiki/File:Traditional_Managu.jpg
-- Traditional gourd image — Stephenwanjau — CC BY-SA 3.0 — https://commons.wikimedia.org/wiki/File:Traditional_Gourd_Used_by_the_Kipsigis_tribe_in_kenya..jpg
+```
+  MenuKe server running
+  Open: http://localhost:3000
+```
 
-If you redistribute the app or include modified versions of images with share-alike licenses, ensure you comply with the license terms.
+### Step 3 — Open the app
 
----
+Go to **[http://localhost:3000](http://localhost:3000)** in your browser.
 
-## Customization
-
-- To add or edit recipes, open `script.js` and modify the `recipes` array. Keep `id` unique for each recipe.
-- To change the PDF header or layout, edit `generateShoppingList()` in `script.js`.
-- To change UI styling, edit `styles.css`.
+To stop the server press `Ctrl + C` in the terminal.
 
 ---
 
-## Troubleshooting
+## How It Works
 
-- Images not displaying: verify the URL is reachable (HTTP 200). For production stability, prefer local image files.
-- PDF generation issues: make sure `jspdf` is loaded in `index.html`. If your browser blocks downloads from local files, run a local server and retry.
-- LocalStorage not saving: check browser settings for storage privacy or open the browser console for errors.
+**County selection**
+Choose from all 47 Kenyan counties via the dropdown, or click *Auto-Detect My County* which uses your device's geolocation to find the nearest county automatically.
 
----
+**Food items**
+Each county maps to one of 8 regions — Nyanza, Western, Central, Nairobi, Coast, Rift Valley, Eastern, North Eastern. Selecting a county reveals food items for that region, filterable by category (Protein, Carb, Side, Drink, Snack) or searchable by name.
 
-## Contributing
+**Plate builder**
+Click *Add to My Plate* on any food card. The plate section shows your selected items as chips, a running calorie total, and a nutrition summary. Items can be removed individually or the whole plate cleared. The plate resets when you switch county.
 
-Contributions are welcome. Suggested workflow:
+**Weekly planner**
+Once your plate is built, assign it to any day of the week. The weekly grid shows all 7 days — filled days show a thumbnail of each food item with its calorie count. Individual days can be cleared, or the whole week reset. **The weekly plan persists across browser sessions** using localStorage.
 
-1. Fork or copy the project.
-2. Make changes locally and test by opening `index.html` or serving via a local server.
-3. If adding images, include them in an `assets/` folder and update `script.js` paths.
-4. Submit a patch or copy the updated files back.
-
-Please include image license/source information when adding new external images.
+**PDF download**
+Generates a two-page PDF: page one shows the day-by-day plate breakdown with calorie totals, page two shows a consolidated shopping list with items marked with how many days they appear.
 
 ---
 
+## Image System
+
+Food card images use a **hybrid approach** — Unsplash for generic dishes it photographs well, Wikimedia Commons for specifically Kenyan dishes that require accurate dedicated images.
+
+### Unsplash — 22 items (via proxy)
+
+The Node.js server proxies requests to the Unsplash API so the API key is never exposed in the browser. Each item has a **curated descriptive search term** in English (e.g. `"grilled goat meat roasted charcoal smoke platter kenya"`) chosen to return visually accurate results.
+
+Images are **cached in server memory** so each item is fetched only once per session. Cards render immediately with a fallback URL, then update silently once Unsplash responds.
+
+### Wikimedia Commons — 6 items (static URL)
+
+| Item | Reason |
+|------|--------|
+| Sukuma Wiki | Accurate dedicated image in Wikimedia |
+| Matoke (Steamed Bananas) | Accurate dedicated image in Wikimedia |
+| Githeri | Accurate dedicated image in Wikimedia |
+| Pilau Rice | Kenyan pilau specifically photographed in Wikimedia |
+| Managu (African Nightshade) | Accurate dedicated image in Wikimedia |
+| Camel Milk (Suusa) | Accurate dedicated image in Wikimedia |
+
+### Fallback behaviour
+
+If the server is unreachable or Unsplash returns no result, every card falls back to its hardcoded static URL gracefully — no broken images.
+
+### API key security
+
+The Unsplash Access Key lives **only in `server.js`** and is never sent to the browser or included in any client-side file.
+
+---
+
+## Data
+
+**28 food items** across 8 regions, each with:
+
+- `id` — unique identifier (region-prefixed, e.g. 101 = Nyanza item 1)
+- `name` — display name including local Kenyan name where applicable
+- `region[]` — array of regions where the dish is eaten
+- `category` — Protein / Carb / Side / Drink / Snack
+- `calories` — approximate kcal per serving
+- `nutrition` — primary nutrition label (e.g. High Protein, High Fiber, Probiotic)
+- `type` — food character tag (e.g. Omega-3 Rich, Street Food, Slow Release Carb)
+- `img` — fallback static image URL
+
+**47 counties** mapped to 8 regions, with lat/lon coordinates for geolocation.
+
+**6 filter categories** — All, Protein, Carb, Side, Drink, Snack
+
+---
+
+## State & Storage
+
+| Key | Where stored | Lifetime | Contents |
+|-----|-------------|----------|----------|
+| `menuKeWeekly` | localStorage | Permanent | Weekly planner — survives refresh and browser close |
+| `currentPlate` | Memory | Until county change or refresh | Items currently being built |
+| `currentRegion` | Memory | Until refresh | Active region from selected county |
+| `currentCategoryFilter` | Memory | Until refresh | Active category filter chip |
+| `imgCache` | Memory | Until server restart | Unsplash URLs cached per session |
+
+---
+
+## Functions Reference
+
+| Function | Purpose |
+|----------|---------|
+| `manualSelect()` | County dropdown change → set region, render food grid and plate |
+| `detectLocation()` | Geolocation → find nearest county → call manualSelect |
+| `findNearestCounty(lat, lon)` | Euclidean distance across county coordinates |
+| `getRegionItems()` | Filter foodItems by currentRegion |
+| `renderCategoryFilters()` | Build filter chip bar |
+| `renderFoodItems()` | Render food cards, trigger Unsplash prefetch |
+| `togglePlateItem(id)` | Add or remove item from currentPlate |
+| `renderPlate()` | Update plate chips, calorie total, nutrition pills |
+| `clearPlate()` | Empty currentPlate |
+| `assignPlateToDay()` | Save currentPlate to weeklyPlanner[day] + localStorage |
+| `renderWeeklyPlanner()` | Render 7-day grid |
+| `removeDayPlan(day)` | Clear one day from planner |
+| `resetWeeklyPlan()` | Clear entire week with confirm prompt |
+| `updateDownloadBtn()` | Show/hide PDF download button based on planner content |
+| `getUnsplashImage(item)` | Fetch image from proxy or return static URL |
+| `prefetchAndUpdateImages(items)` | Parallel fetch all images, update DOM cards |
+| `handleSearch(e)` | Search food items by name/type/nutrition |
+| `renderLogoToBase64()` | Return embedded MenuKe logo for PDF header |
+| `generateShoppingList()` | Export weekly plan + shopping list as PDF |
+| `showToast(msg)` | Slide-up notification toast |
+
+---
+
+## Dependencies
+
+| Dependency | Version | Purpose | How loaded |
+|---|---|---|---|
+| jsPDF | 2.5.1 | PDF generation | cdnjs CDN |
+| Font Awesome | 6.5.1 | UI icons | cdnjs CDN |
+| Node.js | LTS | HTTP server, Unsplash proxy | Installed locally |
+
+No npm packages are required. `package.json` is included for future dependency management.
+
+---
+
+## Browser Support
+
+Works in all modern browsers — Chrome, Firefox, Edge, Safari.
+
+Requires an active internet connection for food images (Unsplash + Wikimedia). Geolocation for auto-detect is optional — manual county selection always works.

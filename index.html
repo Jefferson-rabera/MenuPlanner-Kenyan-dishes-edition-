@@ -10,69 +10,146 @@
 </head>
 <body>
 
+<!-- ══════════════════════════════════
+     HEADER
+══════════════════════════════════ -->
 <header class="topbar">
     <div class="topbar-inner">
         <img src="assets/images/spoon-fork.svg" alt="MenuKe logo" class="brand-logo">
         <h1 class="brand">MenuKe</h1>
         <p class="brand-motto">Local Kenyan Meals, Fresh Every Week</p>
-        
+
         <div class="topbar-search">
-            <input type="text" id="recipe-search" placeholder="Search recipes..." class="search-input">
-            <i class="fa-solid fa-search"></i>
+            <input type="text" id="recipe-search" placeholder="Search food items..." class="search-input">
+            <i class="fa-solid fa-magnifying-glass"></i>
         </div>
-        
-        <a href="#favorites-section" class="favorites-quick-link" title="View saved meals">
-            <i class="fa-solid fa-heart"></i>
-            <span id="header-fav-count" class="fav-count-badge">0</span>
-        </a>
+
     </div>
 </header>
 
-<section class="hero food-hero">
+<!-- ══════════════════════════════════
+     HERO
+══════════════════════════════════ -->
+<section class="food-hero">
     <div class="hero-inner">
-        <h2>Local Kenyan Meals, Fresh Every Week</h2>
-        <p>Discover regional recipes, plan your week, and print a shopping list in one click.</p>
-        
+        <h2>Build Your Own Plate</h2>
+        <p>Pick individual foods from your region &mdash; mix, match, and plan your week your way.</p>
     </div>
 </section>
 
+<!-- ══════════════════════════════════
+     MAIN CONTENT
+══════════════════════════════════ -->
 <div class="container">
+
+    <!-- COUNTY PICKER -->
     <div class="card-panel">
-        <h3 style="margin-top:0; color:var(--ww-green)">Find Your Regional Special</h3>
-        <p style="font-size: 0.9rem; color: #666;">Choose your county to see balanced meal plans tailored to your local produce.</p>
-        <select id="county-select" class="modern-select" onchange="manualSelect()">
-            <option value="">-- Search 47 Counties --</option>
+        <h3 style="margin-top:0; color:var(--ww-green)">
+            <i class="fa-solid fa-map-location-dot"></i> Choose Your County
+        </h3>
+        <p style="font-size:0.9rem; color:#666; margin-bottom:16px;">
+            Select your county to see food items from your region and build your own plate.
+        </p>
+        <select id="county-select" class="modern-select">
+            <option value="">-- Select from 47 Counties --</option>
         </select>
-        <button class="btn-action" style="width: 100%; margin-top: 15px;" onclick="detectLocation()"> <i class="fa-solid fa-map-location-dot"></i> Auto-Detect My County</button>
+        <button id="detect-btn" class="btn-action" style="width:100%; margin-top:15px;">
+            <i class="fa-solid fa-location-crosshairs"></i> Auto-Detect My County
+        </button>
     </div>
 
-    <div id="results" style="display:none; margin-top: 40px;">
-        <h2 id="location-heading" style="color: var(--ww-green); margin-bottom: 25px;">Suggested for you</h2>
-        
-        <div id="filter-bar" style="margin-bottom: 20px; text-align: center;">
-            <button class="filter-chip active" onclick="applyCalorieFilter('all', this)">All Meals</button>
-            <button class="filter-chip" onclick="applyCalorieFilter('low', this)">Under 500 Cal</button>
-            <button class="filter-chip" onclick="applyCalorieFilter('high', this)">High Energy</button>
-        </div>
-        
+    <!-- FOOD ITEMS GRID -->
+    <div id="results" style="display:none; margin-top:40px;">
+        <h2 id="location-heading" style="color:var(--ww-green); margin-bottom:20px;">
+            Available Foods
+        </h2>
+
+        <!-- Category filter chips — populated by JS -->
+        <div id="filter-bar" style="display:none; flex-wrap:wrap; gap:8px; margin-bottom:24px;"></div>
+
         <div class="recipe-grid" id="recipe-list"></div>
     </div>
 
-    <div class="card-panel" id="weekly-planner-section">
-        <h2><i class="fa-solid fa-calendar" style="color: #00501a;"></i> My Weekly Schedule</h2>
-        <div id="weekly-grid"></div>
+    <!-- ══════════════════════════════════
+         PLATE BUILDER
+    ══════════════════════════════════ -->
+    <div id="plate-builder-section" class="card-panel" style="display:none; margin-top:40px;">
+
+        <div style="display:flex; justify-content:space-between; align-items:center;
+            flex-wrap:wrap; gap:12px; margin-bottom:20px;">
+            <h2 style="margin:0; color:var(--ww-green);">
+                <i class="fa-solid fa-bowl-food"></i> My Plate
+            </h2>
+            <button id="clear-plate-btn" class="btn-action btn-reset">
+                <i class="fa-solid fa-trash"></i> Clear Plate
+            </button>
+        </div>
+
+        <!-- Empty state message -->
+        <p id="plate-empty-msg" style="color:#bbb; text-align:center; padding:24px 0; font-size:0.9rem;">
+            Select food items above to start building your plate
+        </p>
+
+        <!-- Selected items shown as chips -->
+        <div id="plate-display"></div>
+
+        <!-- Calorie + nutrition summary bar -->
+        <div class="plate-summary">
+            <div class="plate-total-cal">
+                <i class="fa-solid fa-fire" style="color:#e63946;"></i>
+                <strong id="plate-calories">0</strong> kcal total
+            </div>
+            <div id="nutrition-summary" class="nutrition-summary"></div>
+        </div>
+
+        <!-- Assign to day — shown only when plate has items -->
+        <div id="plate-assign-section" style="display:none; margin-top:20px;
+            border-top:1px solid #eee; padding-top:20px;">
+            <h4 style="margin:0 0 12px; color:#555;">
+                <i class="fa-solid fa-calendar-plus"></i> Save this plate to a day:
+            </h4>
+            <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+                <select id="assign-day-select" class="modern-select" style="flex:1; min-width:160px;">
+                    <option value="">Choose a day...</option>
+                    <option>Monday</option>
+                    <option>Tuesday</option>
+                    <option>Wednesday</option>
+                    <option>Thursday</option>
+                    <option>Friday</option>
+                    <option>Saturday</option>
+                    <option>Sunday</option>
+                </select>
+                <button id="assign-plate-btn" class="btn-action" style="white-space:nowrap;">
+                    <i class="fa-solid fa-calendar-check"></i> Save to Day
+                </button>
+            </div>
+        </div>
     </div>
 
-    <div class="favorites-section">
-        <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px;">
-            <h2 style="display:flex; align-items:center; gap:10px;"><i class="fa-solid fa-bookmark" style="color: #00501a;"></i> Saved Meals <span id="saved-count" class="saved-count-badge">0</span></h2>
-            <button id="print-btn" class="btn-action btn-print" style="display:none;" title="Print Shopping List"><i class="fa-solid fa-print"></i> Print Weekly Menu</button>
+    <!-- ══════════════════════════════════
+         WEEKLY PLANNER
+    ══════════════════════════════════ -->
+    <div class="card-panel" style="margin-top:40px;">
+        <div style="display:flex; justify-content:space-between; align-items:center;
+            margin-bottom:20px; flex-wrap:wrap; gap:12px;">
+            <h2 style="margin:0;">
+                <i class="fa-solid fa-calendar-week" style="color:#00501a;"></i>
+                My Weekly Schedule
+            </h2>
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                <button id="print-btn" class="btn-action btn-print" style="display:none;">
+                    <i class="fa-solid fa-file-arrow-down"></i> Download Shopping List
+                </button>
+                <button id="reset-week-btn" class="btn-action btn-reset">
+                    <i class="fa-solid fa-arrow-rotate-left"></i> Reset Week
+                </button>
+            </div>
         </div>
-        <div class="recipe-grid" id="favorites-list">
-            <p id="no-favs">No favorites saved yet.</p>
-        </div>
+        <div id="weekly-grid" class="weekly-grid"></div>
     </div>
-</div>
+
+
+</div><!-- /container -->
 
 <script src="script.js"></script>
 </body>
